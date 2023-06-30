@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
@@ -27,7 +28,20 @@ public class WebDriverConfig {
         this.webDriverPath = properties.getProperty("webdriver.path");
         this.start = LocalDateTime.parse(properties.getProperty("start"), DATE_TIME_FORMATTER_PATTERN);
         this.end = LocalDateTime.parse(properties.getProperty("end"), DATE_TIME_FORMATTER_PATTERN);
+        checkDates();
         this.alertsList = properties.getProperty("alerts");
+    }
+
+    private void checkDates() {
+        if (start.isBefore(LocalDateTime.now()) || end.isBefore(LocalDateTime.now())) {
+            throw new DateTimeException("The dat can't be earlier then today!");
+        }
+        if (start.isAfter(LocalDateTime.now().plusDays(3)) || end.isAfter(LocalDateTime.now().plusDays(4))) {
+            throw new DateTimeException("You can't perform mask 4 days in advance!");
+        }
+        if (start.isAfter(end)) {
+            throw new DateTimeException("Start date can't be alter then end date!");
+        }
     }
 }
 

@@ -26,6 +26,7 @@ public class WebDriverMainService implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        System.out.println("Hello, CSE. You feel tiered and want to have wet night dreams...");
         startJob();
     }
 
@@ -35,15 +36,20 @@ public class WebDriverMainService implements CommandLineRunner {
         driver.get("https://remote-eu.eservice.huawei.com:2007/?random=0.6424087888580134&amp;request_locale=en&amp;siteStatus=1#/resourceAll?showType=site&amp;from=eservicePortalIframe");
         loginToEserviceWebSite(driver);
         waitUntilPageLoads(driver);
-        getClientsNameForEachPage(driver, getNumberOfPages(driver));
-        // getClientsName(driver);
+        int amountOfMaskedClients = getClientsNameForEachPage(driver, getNumberOfPages(driver));
+        SendMessageHowManyClientsWereMasked(amountOfMaskedClients);
         driver.quit();
     }
 
-    private void getClientsNameForEachPage(WebDriver driver, int numberOfPages) {
+    private void SendMessageHowManyClientsWereMasked(int amountOfMaskedClients) {
+        System.out.println(String.format("The amount of succesfully masked clients is: %d", amountOfMaskedClients));
+    }
+
+    private int getClientsNameForEachPage(WebDriver driver, int numberOfPages) {
+        int amountOfMaskedClients = 0;
         for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
             List<WebElement> getClientsName = getClientsName(driver, pageNumber);
-            for (int j = 0; j < getClientsName.size(); j++) {
+            for (int j = 0; j < getClientsName.size(); j++, amountOfMaskedClients++) {
                 String clientName = getClientsName.get(j).getText();
                 performMaskAlert(driver, pageNumber, j, clientName);
             }
@@ -51,6 +57,7 @@ public class WebDriverMainService implements CommandLineRunner {
                 moveToAnotherPage(driver, pageNumber);
             }
         }
+        return amountOfMaskedClients;
     }
 
     private void moveToAnotherPage(WebDriver driver, int pageNumber) {
@@ -83,6 +90,14 @@ public class WebDriverMainService implements CommandLineRunner {
 
     private void addDataToMaskAlert(WebDriver driver) {
         //  driver.findElement(By.id("mani_icon_div")).click();
+        String startDate = webDriverConfig.getStart().toLocalDate().toString();
+        String startHour = String.valueOf(webDriverConfig.getStart().getHour());
+        String startMinute = String.valueOf(webDriverConfig.getStart().getMinute());
+        String startSeconds = String.valueOf(webDriverConfig.getStart().getSecond());
+        String enddate = webDriverConfig.getEnd().toLocalDate().toString();
+        String endHour = String.valueOf(webDriverConfig.getEnd().getHour());
+        String endMinute = String.valueOf(webDriverConfig.getEnd().getMinute());
+        String endSeconds = String.valueOf(webDriverConfig.getEnd().getSecond());
         Set<String> windowsSet = driver.getWindowHandles();
         System.out.println("****" + windowsSet);
         Iterator<String> stringIterator = windowsSet.iterator();
@@ -92,28 +107,28 @@ public class WebDriverMainService implements CommandLineRunner {
         driver.findElement(By.xpath("//span[@ng-bind='m1.label' and contains (text(), 'Alarm Masking')]")).click();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
         driver.findElement(By.xpath("//button[contains (text(), 'Create')]")).click();
-        driver.findElement(By.xpath("//*[@id=\"alarmShieldHandleForm\"]/table/tbody/tr[1]/td[3]/span/input")).sendKeys("Tst");
+        driver.findElement(By.xpath("//*[@id=\"alarmShieldHandleForm\"]/table/tbody/tr[1]/td[3]/span/input")).sendKeys("Alert1");
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div/span[1]")).click();
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/input")).clear();
-        driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/input")).sendKeys("2023-06-30");
+        driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/input")).sendKeys(webDriverConfig.getStart().toLocalDate().toString());
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[1]")).click();
-        driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[1]")).sendKeys("18");
+        driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[1]")).sendKeys(String.valueOf(webDriverConfig.getStart().getHour()));
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[2]")).click();
-        driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[2]")).sendKeys("18");
+        driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[2]")).sendKeys(String.valueOf(webDriverConfig.getStart().getMinute()));
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[3]")).click();
-        driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[3]")).sendKeys("18");
+        driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[1]/div/input[3]")).sendKeys(String.valueOf(webDriverConfig.getStart().getSecond()));
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/div[2]/button[2]")).click();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         //END DAte
         driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[1]/span")).click();
         driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/input")).clear();
-        driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/input")).sendKeys("2023-06-30");
+        driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/input")).sendKeys(webDriverConfig.getEnd().toLocalDate().toString());
         driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[1]")).click();
-        driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[1]")).sendKeys("18");
+        driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[1]")).sendKeys(String.valueOf(webDriverConfig.getEnd().getHour()));
         driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[2]")).click();
-        driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[2]")).sendKeys("18");
+        driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[2]")).sendKeys(String.valueOf(webDriverConfig.getEnd().getMinute()));
         driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[3]")).click();
-        driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[3]")).sendKeys("19");
+        driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[1]/div/input[3]")).sendKeys(String.valueOf(webDriverConfig.getEnd().getSecond()));
         driver.findElement(By.xpath("//*[@id=\"endDate\"]/div[2]/div[2]/div[2]/button[2]")).click();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         //Masking scope current client
@@ -123,13 +138,12 @@ public class WebDriverMainService implements CommandLineRunner {
         //*[@id="alarmShieldHandleForm"]/table/tbody/tr[8]/td[3]/section[2]/input
         driver.findElement(By.xpath("//*[@id=\"alarmShieldHandleForm\"]/table/tbody/tr[8]/td[3]/section[2]/button")).click();
         //  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
-        driver.findElement(By.xpath("//*[@id=\"alarmShieldHandleForm\"]/table/tbody/tr[9]/td[3]/div/textarea")).sendKeys("test_alert");
+        driver.findElement(By.xpath("//*[@id=\"alarmShieldHandleForm\"]/table/tbody/tr[9]/td[3]/div/textarea")).sendKeys("customer request");
         driver.findElement(By.xpath("/html/body/div[1]/div/div/div[3]/button[1]")).click();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         driver.close();
         driver.switchTo().window(parentWindow);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-
     }
 
     private void waitUntilPageLoads(WebDriver driver) {
