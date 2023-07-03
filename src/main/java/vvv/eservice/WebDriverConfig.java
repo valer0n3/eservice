@@ -23,6 +23,7 @@ public class WebDriverConfig {
     public WebDriverConfig() throws IOException {
         Properties properties = new Properties();
         FileInputStream fileInputStream = new FileInputStream("src\\main\\resources\\application.properties");
+        String path = WebDriverConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         properties.load(fileInputStream);
         this.webDriverName = properties.getProperty("webdriver.name");
         this.webDriverPath = properties.getProperty("webdriver.path");

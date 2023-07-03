@@ -107,7 +107,7 @@ public class WebDriverMainService implements CommandLineRunner {
         driver.findElement(By.xpath("//span[@ng-bind='m1.label' and contains (text(), 'Alarm Masking')]")).click();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
         driver.findElement(By.xpath("//button[contains (text(), 'Create')]")).click();
-        driver.findElement(By.xpath("//*[@id=\"alarmShieldHandleForm\"]/table/tbody/tr[1]/td[3]/span/input")).sendKeys("Alert1");
+        driver.findElement(By.xpath("//*[@id=\"alarmShieldHandleForm\"]/table/tbody/tr[1]/td[3]/span/input")).sendKeys("AlertK");
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div/span[1]")).click();
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/input")).clear();
         driver.findElement(By.xpath("//*[@id=\"startDate\"]/div[2]/div[2]/input")).sendKeys(webDriverConfig.getStart().toLocalDate().toString());
